@@ -1,16 +1,27 @@
-# Basic Sample Hardhat Project
+# Solidity training
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
-
-Try running some of the following tasks:
-
+### Deploy notes:
+1. to run the smart contract:
 ```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
+npx hardhat run scripts/run.js
 ```
-# solidity-training
+2. to deploy the contract on local network (like server)
+```shell
+npx hardhat run scripts/deploy.js --network localhost
+```
+3. to deploy the contract on real test Ethereum network
+```shell
+npx hardhat run scripts/deploy.js --network rinkeby
+```
+**Note:** in order to do this you need to have a `.env` file in the project root directory.
+The file should contain two things:
+```properties
+STAGING_ALCHEMY_KEY=<the particular link to your alchemy API/network>
+PRIVATE_KEY=<your ethereum account 32-byte private key\
+  (the account should be also in rinkeby test network)>
+```
+For example `.env` file:
+```properties
+STAGING_ALCHEMY_KEY=https://eth-rinkeby.alchemyapi.io/v2/<my alchemy api key>
+PRIVATE_KEY=943cc...
+```
