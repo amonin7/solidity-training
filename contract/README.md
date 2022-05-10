@@ -25,3 +25,14 @@ For example `.env` file:
 STAGING_ALCHEMY_KEY=https://eth-rinkeby.alchemyapi.io/v2/<my alchemy api key>
 PRIVATE_KEY=943cc...
 ```
+
+### Re-deploy notes:
+So, now that we've updated our contract we need to do a few things:
+1. We need to deploy it again.
+2. We need to update the contract address on our frontend.
+3. We need to update the abi file on our frontend. 
+
+So what we'll need to do now is:
+1. Deploy again using `npx hardhat run scripts/deploy.js --network rinkeby`
+2. Change contractAddress in `App.js` to be the new contract address we got from the step above in the terminal just like we did before the first time we deployed.
+3. Get the updated abi file from `artifacts/contracts/WavePortal.sol/WavePortal.json` like we did before and copy-paste it into Replit just like we did before.
