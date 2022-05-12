@@ -16,15 +16,16 @@ const main = async () => {
         "Contract balance:",
         hre.ethers.utils.formatEther(contractBalance)
     );
-
-    let waveCount;
-    waveCount = await waveContract.getTotalWaves();
-    console.log(waveCount.toNumber());
+    await waveContract.getTotalWaves();
 
     /**
      * Let's send a few waves!
      */
     let waveTxn = await waveContract.wave("A message!");
+    await waveTxn.wait(); // Wait for the transaction to be mined
+    waveTxn = await waveContract.wave("A message!");
+    await waveTxn.wait(); // Wait for the transaction to be mined
+    waveTxn = await waveContract.wave("A message!");
     await waveTxn.wait(); // Wait for the transaction to be mined
 
     /*
@@ -36,7 +37,7 @@ const main = async () => {
         hre.ethers.utils.formatEther(contractBalance)
     );
 
-    const [_, randomPerson] = await hre.ethers.getSigners();
+    const [, randomPerson] = await hre.ethers.getSigners();
     waveTxn = await waveContract.connect(randomPerson).wave("Another message!");
     await waveTxn.wait(); // Wait for the transaction to be mined
 

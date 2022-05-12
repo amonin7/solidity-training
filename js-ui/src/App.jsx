@@ -30,13 +30,12 @@ const App = () => {
                 /*
                  * We only need address, timestamp, and message in our UI so let's pick those out
                  */
-                let wavesCleaned = [];
-                waves.forEach(wave => {
-                    wavesCleaned.push({
+                const wavesCleaned = waves.map(wave => {
+                    return {
                         address: wave.waver,
                         timestamp: new Date(wave.timestamp * 1000),
-                        message: wave.message
-                    });
+                        message: wave.message,
+                    };
                 });
                 /*
                  * Store our data in React State
@@ -126,7 +125,7 @@ const App = () => {
                 /*
                 * Execute the actual wave from your smart contract
                 */
-                const waveTxn = await wavePortalContract.wave(message);
+                const waveTxn = await wavePortalContract.wave(message, { gasLimit: 300000 })
                 console.log("Mining...", waveTxn.hash);
 
                 await waveTxn.wait();
@@ -142,33 +141,63 @@ const App = () => {
         }
     };
 
+    /**
+     * Listen in for emitter events!
+     */
     useEffect(() => {
         checkIfWalletIsConnected();
+        let wavePortalContract;
+
+        const onNewWave = (from, timestamp, message) => {
+            console.log("NewWave", from, timestamp, message);
+            setAllWaves(prevState => [
+                ...prevState,
+                {
+                    address: from,
+                    timestamp: new Date(timestamp * 1000),
+                    message: message,
+                },
+            ]);
+        };
+
+        if (window.ethereum) {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+
+            wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+            wavePortalContract.on("NewWave", onNewWave);
+        }
+
+        return () => {
+            if (wavePortalContract) {
+                wavePortalContract.off("NewWave", onNewWave);
+            }
+        };
     }, []);
 
     return (
         <div className="mainContainer">
             <div className="dataContainer">
                 <div className="header">
-                    👋 Hey there!
+                    👋 Hey, I am Andrey Minin!
                 </div>
 
-
                 <div className="bio">
-                    I am Andrey Minin and I worked on self-driving cars so that's pretty
-                    cool right? Connect your Ethereum wallet and wave at me!
+                    I developed this smart-contract as a pet-project to understand,
+                    how the smart contracts actually work. I'm ready to present this to you.
+                    You can write some connect your wallet, write some message and post it into Ethereum Network.
+                    This message will appear below.
                 </div>
 
                 <form onSubmit={wave}>
                     <input
                         type="text"
-                        name="username"
-                        placeholder="Please enter your message here"
+                        name="msg"
+                        placeholder="Enter your message here"
                         onChange={changeMessage}
                     />
                     <input type="submit" value="Wave at Me" className="waveButton" />
                 </form>
-
 
                 {/*
                 * If there is no currentAccount render this button
@@ -179,6 +208,7 @@ const App = () => {
                     </button>
                 )}
 
+                <div className="messagesHeader">Messages</div>
                 {allWaves.map((wave, index) => {
                     return (
                         <div key={index} style={{ backgroundColor: "OldLace", marginTop: "16px", padding: "8px" }}>
